@@ -1,0 +1,14 @@
+create table users(id int primary key, json text);
+insert into users values(1, '{"root":{"node1":{"node2":{"age": 10, "name": "A"}}}}');
+insert into users values(2, '{"root":{"node1":{"node2":{"age": 25, "name": "B"}}}}');
+insert into users values(3, '{}');
+.headers on
+.mode column
+
+select rowid, key, value 
+from (
+    select * from (
+        select rowid, json from users
+    ) as users, json_tree(json_extract(users.json, '$.root.node1.node2')) 
+    where key!=''
+);
